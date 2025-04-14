@@ -1,0 +1,67 @@
+package pages
+
+import "photogo/internal/templates/layout"
+
+templ Home() {
+    @layout.Base(layout.BaseProps{
+    Title: "Welcome to PhotoGo",
+    Description: "A modern web application template using Go, HTMX, Tailwind CSS, and more.",
+    }) {
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to PhotoGo</h1>
+        <p class="text-lg text-gray-600 mb-8">
+                A modern web application template using Go, HTMX, Tailwind CSS, and more.
+                </p>
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Try HTMX Integration</h2>
+                    <p class="text-gray-600 mb-4">Click the button below to see HTMX in action. It will make a POST request to our
+                        API endpoint.</p>
+                    <div class="flex flex-col items-start gap-4">
+                        <button
+							class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+							hx-post="/api/hello"
+							hx-target="#message"
+							hx-swap="innerHTML"
+							hx-indicator="#spinner">
+							Get Greeting
+						</button>
+						
+                        <div class="flex items-center gap-3">
+                            <div id="spinner" class="htmx-indicator">
+                                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+                            </div>
+                            <div id="message" class="text-gray-800 min-h-[1.5rem]"></div>
+                            </div>
+                            </div>
+                            </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Tech Stack</h2>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li><span class="font-semibold">Go + Echo:</span> Fast and minimalist web framework</li>
+                        <li><span class="font-semibold">HTMX:</span> Modern browser capabilities with simple HTML attributes</li>
+                        <li><span class="font-semibold">Tailwind CSS:</span> Utility-first CSS framework</li>
+                        <li><span class="font-semibold">templ:</span> Type-safe HTML templates for Go</li>
+                        <li><span class="font-semibold">Task:</span> Task runner for development workflow</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Getting Started</h2>
+                    <div class="space-y-4">
+                        <p class="text-gray-600">Run the following commands to start development:</p>
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <code class="text-sm text-gray-800">
+                                								<div>$ task install-tools</div>
+                                								<div>$ task dev</div>
+                                							</code>
+                        </div>
+                        <p class="text-gray-600">
+                            Visit <a href="http://localhost:8080"
+                                class="text-indigo-600 hover:text-indigo-800">http://localhost:8080</a> to see your app in action.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            </div>
+            }
+}

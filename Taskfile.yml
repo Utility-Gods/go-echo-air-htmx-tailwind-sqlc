@@ -1,0 +1,90 @@
+version: '3'
+
+vars:
+  BINARY_NAME: app
+  BUILD_DIR: bin
+  TAILWIND_VERSION: v4.0.0-alpha.3
+
+tasks:
+  default:
+    cmds:
+      - task: dev
+
+  install-tools:
+    cmds:
+      - go install github.com/air-verse/air@latest
+      - go install github.com/a-h/templ/cmd/templ@latest
+      - mkdir -p bin
+      - curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v4.0.0-alpha.3/tailwindcss-linux-x64
+      - chmod +x tailwindcss-linux-x64
+      - mv tailwindcss-linux-x64 bin/tailwindcss
+    status:
+      - test -f bin/tailwindcss
+    desc: Install required development tools
+
+  download-deps:
+    cmds:
+      - go mod download
+      - go mod tidy
+    desc: Download Go dependencies
+
+  build:
+    deps: [templ-generate, css-build]
+    cmds:
+      - go build -o bin/server ./cmd/main.go
+    desc: Build the application
+
+  dev:
+    deps: [download-deps, install-tools]
+    cmds:
+      - task --parallel css-watch templ-watch run-dev
+    desc: Start development server with hot reload
+
+  css-watch:
+    cmds:
+      - ./bin/tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch
+    desc: Watch and compile Tailwind CSS
+
+  css-build:
+    cmds:
+      - ./bin/tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
+    desc: Build and minify Tailwind CSS
+
+  templ-generate:
+    cmds:
+      - templ generate
+    desc: Generate Go code from templ templates
+
+  templ-watch:
+    cmds:
+      - templ generate --watch
+    desc: Watch and generate Go code from templ templates
+
+  run-dev:
+    cmds:
+      - air
+    desc: Run the development server with hot reload
+
+  migrate-create:
+    cmds:
+      - go run -mod=mod tern migrate new {{.CLI_ARGS}}
+    desc: Create a new migration file
+
+  migrate-up:
+    cmds:
+      - go run -mod=mod tern migrate
+    desc: Run all pending migrations
+
+  migrate-down:
+    cmds:
+      - go run -mod=mod tern migrate --destination -1
+    desc: Rollback the last migration
+
+  sqlc-generate:
+    cmds:
+      - sqlc generate
+
+  clean:
+    cmds:
+      - rm -rf {{.BUILD_DIR}}/*
+      - rm -rf tmp/ 

@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@source "./internal/templates/**/*.{templ,go}";
+
+/* Custom styles here */
+html {
+    font-family: "Roboto", system-ui, sans-serif;
+    background: #fff;
+    background-size: 224px;
+    scroll-behavior: smooth;
+}
+
+/* Add Montserrat for headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Montserrat", system-ui, sans-serif;
+}
+
+/* HTMX Indicators */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+.htmx-request .htmx-indicator {
+    opacity: 1
+}
+.htmx-request.htmx-indicator {
+    opacity: 1
+}

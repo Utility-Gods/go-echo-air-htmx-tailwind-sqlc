@@ -1,0 +1,62 @@
+# Ignore all Templ-generated files
+*_templ.go
+
+*_templ.txt
+# Ignore the entire generated directory if you're using one
+/generated/
+
+# Ignore any temporary files Templ might create
+*.templ.go.tmp
+
+# If you're using a specific output directory for Templ, ignore it
+/templ_out/
+
+# Ignore Templ binary if you're using it locally
+templ
+
+# Ignore any Templ cache directories
+.templ/
+
+
+bin
+
+temp/
+
+tmp/
+
+models/
+
+
+vendor/
+
+
+.env
+
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+ENV/
+build/
+eggs/
+*.egg-info/
+.eggs/
+*.egg
+
+# Poetry
+.poetry/
+poetry.lock
+
+
+dump.rdb
+
+
+tailwindcss
