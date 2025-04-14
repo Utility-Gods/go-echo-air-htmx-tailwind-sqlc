@@ -12,10 +12,12 @@ tasks:
 
   install-tools:
     cmds:
-      - go install github.com/air-verse/air@latest
+      - go install github.com/cosmtrek/air@latest
       - go install github.com/a-h/templ/cmd/templ@latest
+      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+      - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - mkdir -p bin
-      - curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v4.0.0-alpha.3/tailwindcss-linux-x64
+      - curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
       - chmod +x tailwindcss-linux-x64
       - mv tailwindcss-linux-x64 bin/tailwindcss
     status:
@@ -29,15 +31,15 @@ tasks:
     desc: Download Go dependencies
 
   build:
-    deps: [templ-generate, css-build]
     cmds:
-      - go build -o bin/server ./cmd/main.go
+      - task: css-build
+      - task: templ-generate
+      - go build -o bin/server cmd/main.go
     desc: Build the application
 
   dev:
-    deps: [download-deps, install-tools]
     cmds:
-      - task --parallel css-watch templ-watch run-dev
+      - bash -c "task css-watch & task templ-watch & air"
     desc: Start development server with hot reload
 
   css-watch:
@@ -60,26 +62,68 @@ tasks:
       - templ generate --watch
     desc: Watch and generate Go code from templ templates
 
-  run-dev:
+  # Database tasks
+  db-docker-up:
     cmds:
-      - air
-    desc: Run the development server with hot reload
+      - docker-compose up -d postgres
+
+  db-docker-down:
+    cmds:
+      - docker-compose down
+
+  db-create:
+    cmds:
+      - createdb {{.DB_NAME}}
+    vars:
+      DB_NAME:
+        sh: echo ${POSTGRES_DB:-photogo}
+
+  db-drop:
+    cmds:
+      - dropdb {{.DB_NAME}}
+    vars:
+      DB_NAME:
+        sh: echo ${POSTGRES_DB:-photogo}
 
   migrate-create:
     cmds:
-      - go run -mod=mod tern migrate new {{.CLI_ARGS}}
-    desc: Create a new migration file
+      - migrate create -ext sql -dir internal/database/migrations -seq {{.CLI_ARGS}}
+    preconditions:
+      - sh: "[ ! -z \"{{.CLI_ARGS}}\" ]"
+        msg: "Migration name is required. Usage: task migrate-create -- <migration_name>"
 
   migrate-up:
     cmds:
-      - go run -mod=mod tern migrate
-    desc: Run all pending migrations
+      - migrate -path internal/database/migrations -database "{{.DATABASE_URL}}" up
+    vars:
+      DATABASE_URL:
+        sh: echo ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/photogo?sslmode=disable}
 
   migrate-down:
     cmds:
-      - go run -mod=mod tern migrate --destination -1
-    desc: Rollback the last migration
+      - migrate -path internal/database/migrations -database "{{.DATABASE_URL}}" down
+    vars:
+      DATABASE_URL:
+        sh: echo ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/photogo?sslmode=disable}
 
+  migrate-force:
+    cmds:
+      - migrate -path internal/database/migrations -database "{{.DATABASE_URL}}" force {{.CLI_ARGS}}
+    vars:
+      DATABASE_URL:
+        sh: echo ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/photogo?sslmode=disable}
+    preconditions:
+      - sh: "[ ! -z \"{{.CLI_ARGS}}\" ]"
+        msg: "Version number is required. Usage: task migrate-force -- <version>"
+
+  migrate-status:
+    cmds:
+      - migrate -path internal/database/migrations -database "{{.DATABASE_URL}}" version
+    vars:
+      DATABASE_URL:
+        sh: echo ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/photogo?sslmode=disable}
+
+  # Generate SQL code
   sqlc-generate:
     cmds:
       - sqlc generate

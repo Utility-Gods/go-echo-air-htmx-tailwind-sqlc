@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Development tools and directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+bin/
+tmp/
+dist/
+
+# Dependencies
+vendor/
+
+# Environment files
+.env
+.env.*
+
+# Database
+postgres_data/
+
+# Logs
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Generated files
+**/*_templ.go
+**/*.sql.go 
